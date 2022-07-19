@@ -93,7 +93,7 @@ class MainState extends State<Main> {
     print(responsedd.body);
     print(responsedd.statusCode);
   */
-    downloadFile(file);
+   // downloadFile(file);
   }
 
   //Map<String, DownloadProgress> downloadProgress = {};
@@ -138,6 +138,7 @@ class MainState extends State<Main> {
      File file = File(savePath);
      print("saved path");
      var raf = file.openSync(mode: FileMode.write);
+
       raf.writeFromSync(response.data);
       await raf.close();
       print("Success");
