@@ -25,6 +25,9 @@ class MainState extends State<Main> {
   static final token = 'pdf_live_5smO3vYKPzKmJ1R8Po5kFmmJikjOytdbMLicLftLX8i';
   String url = 'https://api.pspdfkit.com/build';
   String baseurl='https://api.pspdfkit.com';
+  var resp;
+  var resp_full;
+  bool check=false;
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +55,13 @@ class MainState extends State<Main> {
             ),
             MaterialButton(
               onPressed: () {
+setState(() {
+  check=true;
+});
 
                 print('dowload file');
+
+                downloadFile(resp,check);
               },
               child: Text(
                 'Dowload file',
@@ -66,7 +74,8 @@ class MainState extends State<Main> {
       ),
     );
   }
-  void dio_uploadFile(File file) async{
+
+   dio_uploadFile(File file) async{
     Dio dio=Dio();
     var headers = {
       'Authorization': 'Bearer pdf_live_5smO3vYKPzKmJ1R8Po5kFmmJikjOytdbMLicLftLX8i',
@@ -83,93 +92,59 @@ class MainState extends State<Main> {
 
     });
 
-    var resp1=await dio.post('https://api.pspdfkit.com/build',data: formData,   options: Options(responseType: ResponseType.bytes,
+     resp=await dio.post('https://api.pspdfkit.com/build',data: formData,   options: Options(responseType: ResponseType.bytes,
         headers:headers
     ),);
  //   resp1.data.pipe(fs.createWriteStream("result.pdf"));
 
     //  print(resp1.data.toString());
    // print(resp1.statusCode.toString());
-    print('status :${resp1.statusCode}');
+    print('status :${resp.statusCode}');
+    print('resp :${resp.data}');
+resp_full=resp.data;
+return resp_full;
+  }
 
-   //  Directory directory = Directory('/storage/emulated/0/Download');
-   // // var directory = await getApplicationDocumentsDirectory();
-   //  print('dir=$directory');
-    // File imgFile = File('/data/user/0/com.example.wordtopdfapp/app_flutter/Output.pdf');
-    // print('imgFile=$imgFile');
 
-    // var bodyBytes = resp1.data;
-    // print(bodyBytes);
-   // PdfDocument document = PdfDocument();
+  void pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        allowedExtensions: ['docx'],
+        type: FileType.custom);
+    if (result != null) {
+      File file = File(result.files.single.path.toString());
+      print(file);
+      //uploadFile(file);
+      resp=dio_uploadFile(file);
+      print("received resp success");
+    } else {
+      return;
+    }
+  }
 
+}
+
+void downloadFile(resp1,ch) async{
+  if (ch==true && resp1 !=null) {
+    print("response received");
     final directory = await getApplicationDocumentsDirectory();
-//Get directory path
     final path = directory.path;
 
-//Create an empty file to write PDF data
-    File file1 = File('$path/Output1.pdf');
+    File file1 = File('$path/Outputnew1.pdf');
 
-//Write PDF data
     await file1.writeAsBytes(resp1.data, flush: true);
 
 //Open the PDF document in mobile
-    OpenFile.open('$path/Output1.pdf');
-
-
-
-   //  file1.open(  mode: FileMode.write,);
-   //  file1.writeAsString(resp1.data.toString());
-   //  print("after as strning");
-   //  //file1.writeAsBytes(resp1.data);
-   // // Future<File> file1 = File('$directory/Output.pdf').create(recursive: true);
-   //  File('data/user/0/Downloads/Output.pdf').copy('data/user/0/Documents/Outputnew.pdf');
-   //  print("okay");
-
-
-
-    /*;
-    final responsedd = await http.Response.fromStream(streamedResponse);
-    print(responsedd);
-    print(responsedd.body);
-    print(responsedd.statusCode);
-  */
-   // downloadFile(file);
+    OpenFile.open('$path/Outputnew1.pdf');
+    print('$path/Outputnew1.pdf');
+    File('$path/Outputnew1.pdf').copy('/Documents/Outputnew1.pdf');
+    print("Success");
+  }else{
+    print("check false");
   }
+}
 
-  //Map<String, DownloadProgress> downloadProgress = {};
-
-  void downloadFile() async{
-    Dio dio=Dio();
-    var headers = {
-      'Authorization': 'Bearer pdf_live_5smO3vYKPzKmJ1R8Po5kFmmJikjOytdbMLicLftLX8i',
-      'Cookie': 'AWSALB=5lvD+3Q0OOiYytHOYlAsBRurD9MEmQ5noPVgN3pEc8ytnp9GQJmDY6wlVcQBT8+BNNPR4XXoWHOQi3zULN1xNntZIUZizJFaXgPeX+dG030nmN4lraR9Lv0pjIW2; AWSALBCORS=5lvD+3Q0OOiYytHOYlAsBRurD9MEmQ5noPVgN3pEc8ytnp9GQJmDY6wlVcQBT8+BNNPR4XXoWHOQi3zULN1xNntZIUZizJFaXgPeX+dG030nmN4lraR9Lv0pjIW2'
-    };
-
-    try {
-      print("inside try ");
-
-      //failed from here-- download should not contain file
-      // var response = await dio.get(
-      //   url,
-      //   options: Options(
-      //     responseType: ResponseType.bytes,
-      //     followRedirects: false,
-      //     headers: headers,
-      //     validateStatus: (status) {
-      //       return status! < 500;
-      //     },
-      //   ),
-      // );
-      print("get response");
-//      print(response.headers);
-
-
-      print("Success");
-    } on DioError catch (e) {
-       print(e.response);
-    }
-  }
-  void uploadFile(File file) async {
+/*  void uploadFile(File file) async {
   //imageFile is your image file
     var headers = {
       'Authorization': 'Bearer pdf_live_iB8XVQtXOYUbGpwMj1zTGY4CYAGoW4SRYyrG25NFIYR',
@@ -188,26 +163,13 @@ class MainState extends State<Main> {
     final responsedd = await http.Response.fromStream(streamedResponse);
 
     print('status code:${responsedd.statusCode}');
-   /* if (response.statusCode == 200) {
+   */
+  /* if (response.statusCode == 200) {
 
       print(await response.stream.bytesToString());
     }
     else {
       print(response.reasonPhrase);
-    }*/
-  }
-  void pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
-        allowedExtensions: ['docx'],
-        type: FileType.custom);
-    if (result != null) {
-      File file = File(result.files.single.path.toString());
-print(file);
-      //uploadFile(file);
-    dio_uploadFile(file);
-    } else {
-      return;
-    }
-  }
-}
+    }*//*
+  }*/
+
