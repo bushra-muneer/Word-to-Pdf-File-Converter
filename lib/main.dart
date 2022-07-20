@@ -1,8 +1,12 @@
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'dart:io';
+import 'package:open_file/open_file.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 
@@ -79,7 +83,7 @@ class MainState extends State<Main> {
 
     });
 
-    var resp1=await dio.post('https://api.pspdfkit.com/build',data: formData,   options: Options(
+    var resp1=await dio.post('https://api.pspdfkit.com/build',data: formData,   options: Options(responseType: ResponseType.bytes,
         headers:headers
     ),);
  //   resp1.data.pipe(fs.createWriteStream("result.pdf"));
@@ -87,6 +91,42 @@ class MainState extends State<Main> {
     //  print(resp1.data.toString());
    // print(resp1.statusCode.toString());
     print('status :${resp1.statusCode}');
+
+   //  Directory directory = Directory('/storage/emulated/0/Download');
+   // // var directory = await getApplicationDocumentsDirectory();
+   //  print('dir=$directory');
+    // File imgFile = File('/data/user/0/com.example.wordtopdfapp/app_flutter/Output.pdf');
+    // print('imgFile=$imgFile');
+
+    // var bodyBytes = resp1.data;
+    // print(bodyBytes);
+   // PdfDocument document = PdfDocument();
+
+    final directory = await getApplicationDocumentsDirectory();
+//Get directory path
+    final path = directory.path;
+
+//Create an empty file to write PDF data
+    File file1 = File('$path/Output1.pdf');
+
+//Write PDF data
+    await file1.writeAsBytes(resp1.data, flush: true);
+
+//Open the PDF document in mobile
+    OpenFile.open('$path/Output1.pdf');
+
+
+
+   //  file1.open(  mode: FileMode.write,);
+   //  file1.writeAsString(resp1.data.toString());
+   //  print("after as strning");
+   //  //file1.writeAsBytes(resp1.data);
+   // // Future<File> file1 = File('$directory/Output.pdf').create(recursive: true);
+   //  File('data/user/0/Downloads/Output.pdf').copy('data/user/0/Documents/Outputnew.pdf');
+   //  print("okay");
+
+
+
     /*;
     final responsedd = await http.Response.fromStream(streamedResponse);
     print(responsedd);
@@ -98,49 +138,32 @@ class MainState extends State<Main> {
 
   //Map<String, DownloadProgress> downloadProgress = {};
 
-  void downloadFile(File file) async{
+  void downloadFile() async{
     Dio dio=Dio();
     var headers = {
       'Authorization': 'Bearer pdf_live_5smO3vYKPzKmJ1R8Po5kFmmJikjOytdbMLicLftLX8i',
       'Cookie': 'AWSALB=5lvD+3Q0OOiYytHOYlAsBRurD9MEmQ5noPVgN3pEc8ytnp9GQJmDY6wlVcQBT8+BNNPR4XXoWHOQi3zULN1xNntZIUZizJFaXgPeX+dG030nmN4lraR9Lv0pjIW2; AWSALBCORS=5lvD+3Q0OOiYytHOYlAsBRurD9MEmQ5noPVgN3pEc8ytnp9GQJmDY6wlVcQBT8+BNNPR4XXoWHOQi3zULN1xNntZIUZizJFaXgPeX+dG030nmN4lraR9Lv0pjIW2'
     };
-    if (file == null) return;
-    Directory? downloadsDirectory = Platform.isIOS
-        ? await getApplicationDocumentsDirectory()
-        : await DownloadsPathProvider.downloadsDirectory;
-    bool hasExisted = downloadsDirectory!.existsSync();
-    print(downloadsDirectory.existsSync());
-    if (!hasExisted) {
-      await downloadsDirectory.create();
-    }
-    print("before save path");
-    print(downloadsDirectory.existsSync());
-    print(downloadsDirectory.toString());
-    String savePath = '${downloadsDirectory.path}/${file}';
+
     try {
       print("inside try ");
 
       //failed from here-- download should not contain file
-      Response response = await dio.get(
-        url,
-        options: Options(
-          responseType: ResponseType.bytes,
-          followRedirects: false,
-          headers: headers,
-          validateStatus: (status) {
-            return status! < 500;
-          },
-        ),
-      );
-      print("after response");
-      print(response.headers);
-      print("status: ${response.statusCode}");
-     File file = File(savePath);
-     print("saved path");
-     var raf = file.openSync(mode: FileMode.write);
+      // var response = await dio.get(
+      //   url,
+      //   options: Options(
+      //     responseType: ResponseType.bytes,
+      //     followRedirects: false,
+      //     headers: headers,
+      //     validateStatus: (status) {
+      //       return status! < 500;
+      //     },
+      //   ),
+      // );
+      print("get response");
+//      print(response.headers);
 
-      raf.writeFromSync(response.data);
-      await raf.close();
+
       print("Success");
     } on DioError catch (e) {
        print(e.response);
