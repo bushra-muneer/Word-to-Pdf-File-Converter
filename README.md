@@ -1,16 +1,22 @@
-# converter_wordtopdf
+# Word To PDF File Converter
 
-A new Flutter project.
+# Introduction
+This project is a Flutter-based Android application that converts Word documents (.docx) to PDF files. The app leverages the flutter_docx and pdf packages to handle the conversion process. This README will guide you through the setup, usage, and structure of the project.
 
-## Getting Started
+# Features
+Select Word files from device storage
 
-This project is a starting point for a Flutter application.
+Convert selected Word files to PDF
 
-A few resources to get you started if this is your first Flutter project:
+View and share the converted PDF files
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+# Prerequisites
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Before you begin, ensure you have met the following requirements:
+
+Flutter SDK
+
+Android Studio or any IDE supporting Flutter development
+
+An Android device or emulator
+
